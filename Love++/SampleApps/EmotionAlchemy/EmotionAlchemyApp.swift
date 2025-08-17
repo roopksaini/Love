@@ -235,6 +235,7 @@ struct LoveDisplay: View {
                 .foregroundStyle(Color.transformationOrange)
             Text("💗")
                 .font(.system(size: 20))
+                .baselineOffset(2) // Slightly raise the heart to align with number
         }
         .shadow(color: Color.transformationOrange.opacity(0.5), radius: 2)
     }

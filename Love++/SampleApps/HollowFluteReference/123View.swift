@@ -96,7 +96,7 @@ struct 123View: View {
                     // This button represents the consciousness being transformed
                     // It shows accumulated love and triggers the sacred I → 1 transformation
                     EntityButton(
-                        action: {
+                        action: { completion in
                             // Primary action: Transform consciousness if love is available
                             if collectedLove > 0 {
                                 // Create the sacred transformation element
@@ -110,21 +110,26 @@ struct 123View: View {
                                     minGap: minGap
                                 )
                                 
-                                // Consume love for transformation
-                                collectedLove -= 1
-                                UserDefaults.standard.set(collectedLove, forKey: "CollectedLoveCount")
-                                
                                 // Play sacred flute sound for transformation
                                 SoundManager.shared.playFluteSound()
                                 
-                                // Update server with transformation tracking
-                                updateServer(receiving123sIncrement: 0, playing123sIncrement: 1)
+                                // Wait for animation to complete, then consume love
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    collectedLove -= 1
+                                    UserDefaults.standard.set(collectedLove, forKey: "CollectedLoveCount")
+                                    updateServer(receiving123sIncrement: 0, playing123sIncrement: 1)
+                                    
+                                    // Call completion callback to reset button state
+                                    completion()
+                                }
                             } else {
                                 // Play empty flute sound when no love is available
                                 SoundManager.shared.playEmptyFluteSound()
+                                // Call completion immediately for empty state
+                                completion()
                             }
                             
-                        }, secondAction: {
+                        }, secondAction: { completion in
                             // Secondary action: Create blood drop transformation
                             if collectedLove > 0 {
                                 addFloatingElement(
@@ -137,23 +142,29 @@ struct 123View: View {
                                     minGap: minGap
                                 )
                                 
-                                // Consume love for blood drop transformation
-                                collectedLove -= 1
-                                UserDefaults.standard.set(collectedLove, forKey: "CollectedLoveCount")
-                                
                                 // Play blood drop sound for deep transformation
                                 SoundManager.shared.playBloodSound()
                                 
-                                // Update server with blood drop transformation
-                                updateServer(receiving123sIncrement: 0, playing123sIncrement: -1)
+                                // Wait for animation to complete, then consume love
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                    collectedLove -= 1
+                                    UserDefaults.standard.set(collectedLove, forKey: "CollectedLoveCount")
+                                    updateServer(receiving123sIncrement: 0, playing123sIncrement: -1)
+                                    
+                                    // Call completion callback to reset button state
+                                    completion()
+                                }
                             } else {
                                 // Play empty flute sound when no love is available
                                 SoundManager.shared.playEmptyFluteSound()
+                                // Call completion immediately for empty state
+                                completion()
                             }
                             
                         }, entityImage: "Krishna",
                            pressedImage: "KrishnaPlaying",
-                           size: buttonSize * 1.5
+                           size: buttonSize * 1.5,
+                           currentLoveCount: collectedLove
                     )
                     .frame(width: buttonSize * 1.5, height: buttonSize * 1.5)
                     .offset(y: -geometry.size.width * 0.10) // Sacred positioning offset
@@ -167,6 +178,7 @@ struct 123View: View {
                                         .foregroundStyle(Color.transformationOrange)
                                     Text("💗")
                                         .font(.system(size: fontScale * 15))
+                                        .baselineOffset(2) // Slightly raise the heart to align with number
                                 }
                                 .shadow(color: Color.transformationOrange.opacity(0.5), radius: 2)
                                 .offset(x: buttonSize * -0.6, y: buttonSize * 0.13)

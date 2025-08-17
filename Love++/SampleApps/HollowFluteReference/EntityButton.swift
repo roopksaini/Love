@@ -10,10 +10,12 @@ struct EntityButton: View {
     // These properties define the button's behavior and appearance
     
     /// Primary action triggered by tap gesture (consciousness transformation)
-    let action: () -> Void
+    /// Receives a completion callback when animation finishes
+    let action: (@escaping () -> Void) -> Void
     
     /// Secondary action triggered by long-press gesture (blood drop transformation)
-    let secondAction: () -> Void
+    /// Receives a completion callback when animation finishes
+    let secondAction: (@escaping () -> Void) -> Void
     
     /// Default entity image to display
     let entityImage: String
@@ -24,6 +26,9 @@ struct EntityButton: View {
     /// Size of the button for proper scaling
     let size: CGFloat
     
+    /// Current love count for transformation check
+    let currentLoveCount: Int
+    
     /// Whether the button is currently being pressed
     @State private var isPressed = false
     
@@ -31,7 +36,8 @@ struct EntityButton: View {
         ZStack {
             // MARK: - Entity Image
             // The entity image that changes based on interaction state
-            Image(isPressed ? pressedImage : entityImage)
+            // Only show pressed image when transformation is possible
+            Image((isPressed && currentLoveCount > 0) ? pressedImage : entityImage)
                 .resizable()
                 .scaledToFit()
                 .frame(width: size, height: size)
@@ -42,8 +48,8 @@ struct EntityButton: View {
         }
         .frame(width: size, height: size)
         .contentShape(Circle())
-        .shadow(color: isPressed ? Color.transformationOrange.opacity(0.9) : .clear, radius: 20, x: 0, y: 0)
-        .shadow(color: isPressed ? Color.transformationOrange.opacity(0.7) : .clear, radius: 35, x: 0, y: 0)
+        .shadow(color: (isPressed && currentLoveCount > 0) ? Color.transformationOrange.opacity(0.9) : .clear, radius: 20, x: 0, y: 0)
+        .shadow(color: (isPressed && currentLoveCount > 0) ? Color.transformationOrange.opacity(0.7) : .clear, radius: 35, x: 0, y: 0)
         .simultaneousGesture(
             // MARK: - Tap Gesture
             // Primary interaction for consciousness transformation
@@ -70,10 +76,10 @@ struct EntityButton: View {
     private func handleTap() {
         if !isPressed {
             isPressed = true
-            action()
             
-            // Reset pressed state after animation completes
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            // Call action with completion callback
+            action {
+                // Animation complete, now safe to reset pressed state
                 isPressed = false
             }
         }
@@ -82,7 +88,9 @@ struct EntityButton: View {
     /// Handles long-press gestures for secondary blood drop transformation actions
     /// Enables advanced transformation patterns and deep consciousness work
     private func handleLongPress() {
-        secondAction()
+        secondAction {
+            // Long press action complete
+        }
     }
 }
 
@@ -91,11 +99,18 @@ struct EntityButton: View {
 
 #Preview {
     EntityButton(
-        action: { print("Consciousness transformation triggered") },
-        secondAction: { print("Blood drop transformation triggered") },
+        action: { completion in 
+            print("Consciousness transformation triggered")
+            completion()
+        },
+        secondAction: { completion in 
+            print("Blood drop transformation triggered")
+            completion()
+        },
         entityImage: "Krishna",
         pressedImage: "KrishnaPlaying",
-        size: 100
+        size: 100,
+        currentLoveCount: 5
     )
     .padding(20)
     .background(Color.black)
