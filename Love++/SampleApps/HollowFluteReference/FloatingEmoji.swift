@@ -91,7 +91,7 @@ struct FloatingEmoji: View {
                         .scaleEffect(showTransformedText ? 0.3 : 1.0)
                         .foregroundStyle(
                             components.suffix == "I" 
-                            ? .black : (components.suffix == "1" 
+                            ? Color.heartPink : (components.suffix == "1" 
                             ? Color.transformationOrange : Color(red: 0.1, green: 0.25, blue: 0.5))
                         )
                         .shadow(color: Color(red: 0.15, green: 0.35, blue: 0.6).opacity(0.5), radius: 2)
@@ -275,10 +275,11 @@ struct FloatingEmoji: View {
 }
 
 // MARK: - Color Extension
-// The sacred golden color used throughout the consciousness coding system
+// The sacred colors used throughout the consciousness coding system
 
 extension Color {
-    static let transformationOrange = Color(red: 255/255, green: 225/255, blue: 85/255)
+    static let transformationOrange = Color(red: 255/255, green: 225/255, blue: 85/255)  // Brighter golden yellow
+    static let heartPink = Color(red: 255/255, green: 85/255, blue: 175/255)  // More vibrant, slightly purplish pink like the heart emoji 💗
 }
 
 // MARK: - Preview
